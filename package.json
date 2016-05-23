@@ -1,0 +1,11 @@
+{
+  "name": "libui",
+  "version": "0.0.0",
+  "description": "Node.js bindings for libui",
+  "main": "hello.js",
+  "private": true,
+  "gypfile": true,
+  "dependencies": {
+    "nan": "*"
+  }
+}

@@ -4,7 +4,7 @@
 
 #include <node.h>
 #include <node_object_wrap.h>
-#include "libui/ui.h"
+#include "../libui/ui.h"
 #include "utils.h"
 
 namespace libui {

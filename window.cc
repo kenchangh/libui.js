@@ -1,9 +1,9 @@
+#include <iostream>
 #include "window.h"
 
 namespace libui {
 
 using v8::Context;
-using v8::Exception;
 using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::FunctionTemplate;
@@ -65,6 +65,7 @@ void Window::New(const FunctionCallbackInfo<Value>& args) {
     int width = 512;
     int height= 512;
     bool hasMenu = true;
+    bool margined = true;
     onClosingCb = FunctionTemplate::New(isolate, Noop)->GetFunction(); // noop
 
     if (optionsPassed) {
@@ -80,31 +81,21 @@ void Window::New(const FunctionCallbackInfo<Value>& args) {
       height = _height->IsNumber() ? _height->NumberValue() : height;
 
       Local<Value> _hasMenu = options->Get(String::NewFromUtf8(isolate, "hasMenu"));
-      hasMenu = _hasMenu->IsNumber() ? _hasMenu->BooleanValue() : hasMenu;
+      hasMenu = _hasMenu->IsBoolean() ? _hasMenu->BooleanValue() : hasMenu;
 
       Local<Value> _onClosingCb = options->Get(String::NewFromUtf8(isolate, "onClosing"));
       if (_onClosingCb->IsFunction()) {
         onClosingCb = Local<Function>::Cast(_onClosingCb);
       }
-    }
 
-    uiInitOptions initOptions;
-    const char *err;
-    memset(&initOptions, 0, sizeof (uiInitOptions));
-    err = uiInit(&initOptions);
-    if (err != NULL) {
-      //fprintf(stderr, "error initializing ui: %s\n", err);
-      uiFreeInitError(err);
-      isolate->ThrowException(Exception::Error(
-        String::NewFromUtf8(isolate, err)));
+      Local<Value> _margined = options->Get(String::NewFromUtf8(isolate, "margined"));
+      margined = _margined->IsBoolean() ? _margined->BooleanValue() : margined;
     }
 
     mainwin = uiNewWindow(title, width, height, hasMenu);
     uiWindowOnClosing(mainwin, onClosing, NULL);
+    uiWindowSetMargined(mainwin, margined);
     uiControlShow(uiControl(mainwin));
-
-    uiMain();
-    uiUninit();
 
     Window* obj = new Window();
     obj->Wrap(args.This());

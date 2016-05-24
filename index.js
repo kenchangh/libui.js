@@ -1,13 +1,19 @@
 const libui = require('./build/Release/libui');
+
+libui.init();
+
 const window = new libui.Window({
   title: 'Cool',
   width: 700,
   height: 700,
-  hasMenu: true,
+  hasMenu: false,
+  margined: false,
   onClosing: (err) => {
     console.log('exited')
   },
 });
+
+libui.render();
 
 /*
 <Window>

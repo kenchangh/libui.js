@@ -1,5 +1,4 @@
 #include <nan.h>
-#include <iostream>
 #include <stdlib.h>
 #include <cstring>
 #include <string>
@@ -21,10 +20,11 @@ using v8::Number;
 using v8::Value;
 
 
-static uiWindow *mainwin;
-
-char* ToCString(String::Utf8Value& value) {
-  return *value;
+char* ToCString(Local<v8::Value> value) {
+  String::Utf8Value utf8Value(value);
+  char *str = (char *) malloc(utf8Value.length() + 1);
+  strcpy(str, *utf8Value);
+  return str;
 }
 
 void CreateVerticalBox(const FunctionCallbackInfo<Value>& args) {
@@ -32,9 +32,25 @@ void CreateVerticalBox(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, "hello world"));
 }
 
+static uiWindow *mainwin;
+static Isolate* isolate;
+static Local<Function> onClosingCb;
+
+void Noop(const FunctionCallbackInfo<Value>& args) {
+}
+
+static int onClosing(uiWindow* window, void* data) {
+  const unsigned argc = 0;
+  Local<Value> argv[argc] = { };
+  onClosingCb->Call(Null(isolate), argc, argv);
+  uiControlDestroy(uiControl(window));
+  uiQuit();
+  return 0;
+}
+
 // new Window([options], cb)
 void CreateWindow(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
+  isolate = args.GetIsolate();
 
   if (args.Length() < 1) {
     // Throw an Error that is passed back to JavaScript
@@ -51,7 +67,7 @@ void CreateWindow(const FunctionCallbackInfo<Value>& args) {
 
   Local<Function> cb;
   const bool optionsPassed = !args[0]->IsFunction();
-  cb = optionsPassed ? Local<Function>::Cast(args[0]) : Local<Function>::Cast(args[1]);
+  cb = optionsPassed ? Local<Function>::Cast(args[1]) : Local<Function>::Cast(args[0]);
   const unsigned argc = 2;
 
   uiInitOptions libuiInitOptions;
@@ -74,13 +90,13 @@ void CreateWindow(const FunctionCallbackInfo<Value>& args) {
   int width = 512;
   int height= 512;
   bool hasMenu = true;
+  onClosingCb = FunctionTemplate::New(isolate, Noop)->GetFunction(); // noop
 
   if (optionsPassed) {
     options = args[0]->ToObject();
 
     Local<Value> _title = options->Get(String::NewFromUtf8(isolate, "title"));
-    String::Utf8Value str(_title);
-    title = _title->IsString() ? ToCString(str) : title;
+    title = _title->IsString() ? ToCString(_title) : title;
 
     Local<Value> _width = options->Get(String::NewFromUtf8(isolate, "width"));
     width = _width->IsNumber() ? _width->NumberValue() : width;
@@ -90,6 +106,11 @@ void CreateWindow(const FunctionCallbackInfo<Value>& args) {
 
     Local<Value> _hasMenu = options->Get(String::NewFromUtf8(isolate, "hasMenu"));
     hasMenu = _hasMenu->IsNumber() ? _hasMenu->BooleanValue() : hasMenu;
+
+    Local<Value> _onClosingCb = options->Get(String::NewFromUtf8(isolate, "onClosing"));
+    if (_onClosingCb->IsFunction()) {
+      onClosingCb = Local<Function>::Cast(_onClosingCb);
+    }
   }
 
   Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, CreateVerticalBox);
@@ -103,6 +124,7 @@ void CreateWindow(const FunctionCallbackInfo<Value>& args) {
   cb->Call(Null(isolate), argc, argv);
 
   mainwin = uiNewWindow(title, width, height, hasMenu);
+  uiWindowOnClosing(mainwin, onClosing, NULL);
 
   uiControlShow(uiControl(mainwin));
   uiMain();

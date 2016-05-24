@@ -120,6 +120,10 @@ void Window::OpenFile(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
   char *filename;
   filename = uiOpenFile(mainwin);
+  if (filename == NULL) {
+    args.GetReturnValue().Set(Null(isolate));
+    return;
+  }
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, filename));
 }
 
@@ -127,6 +131,10 @@ void Window::SaveFile(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
   char *filename;
   filename = uiSaveFile(mainwin);
+  if (filename == NULL) {
+    args.GetReturnValue().Set(Null(isolate));
+    return;
+  }
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, filename));
 }
 

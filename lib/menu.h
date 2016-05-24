@@ -14,13 +14,13 @@ class Menu : public node::ObjectWrap {
   static void Init(v8::Local<v8::Object> exports);
 
  private:
-  explicit Menu(char* menu);
+  explicit Menu(char* menu, Local<Value> items);
   ~Menu();
 
   static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void AppendItem(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void ItemClicked(uiMenuItem *item, uiWindow *w, void *data);
   static v8::Persistent<v8::Function> constructor;
-  char* name;
 };
 
 } // namespace libui

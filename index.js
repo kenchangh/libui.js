@@ -7,12 +7,13 @@ const menu = new libui.Menu('File', [
     label: 'Open',
     type: 'item',
     onClick: () => {
-      const filepath = window.openFile();
+      console.log('haha')
+      /*const filepath = window.openFile();
       if (!filepath) {
         window.msgBox('No file selected', "Don't be alarmed");
         return;
       }
-      window.msgBox('File selected', filepath);
+      window.msgBox('File selected', filepath);*/
     }
   },
   {
@@ -34,13 +35,6 @@ const window = new libui.Window({
     console.log('exited')
   },
 });
-
-const filepath = window.saveFile();
-if (!filepath) {
-  window.msgBox('No file selected', "Don't be alarmed");
-  return;
-}
-window.msgBox('File selected', filepath)//, filepath);
 
 libui.render();
 

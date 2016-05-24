@@ -19,6 +19,9 @@ class Window : public node::ObjectWrap {
 
   static void New(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void SetChild(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void OpenFile(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void SaveFile(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void MsgBox(const v8::FunctionCallbackInfo<v8::Value>& args);
   static v8::Persistent<v8::Function> constructor;
 };
 

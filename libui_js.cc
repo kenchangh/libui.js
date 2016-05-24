@@ -1,6 +1,7 @@
 #include <node.h>
 #include "lib/libui_methods.h"
 #include "lib/window.h"
+#include "lib/menu.h"
 
 namespace libui {
 
@@ -11,7 +12,7 @@ void InitAll(Local<Object> exports) {
   NODE_SET_METHOD(exports, "init", LibUiInit);
   NODE_SET_METHOD(exports, "render", LibUiRender);
   Window::Init(exports);
-  //Menu::Init(exports);
+  Menu::Init(exports);
 }
 
 NODE_MODULE(addon, InitAll) // no semicolon here

@@ -4,6 +4,7 @@
 namespace libui {
 
 using v8::Context;
+using v8::Exception;
 using v8::Function;
 using v8::FunctionCallbackInfo;
 using v8::FunctionTemplate;
@@ -42,10 +43,13 @@ void Window::Init(Local<Object> exports) {
   // Prepare constructor template
   Local<FunctionTemplate> tpl = FunctionTemplate::New(isolate, New);
   tpl->SetClassName(String::NewFromUtf8(isolate, "Window"));
-  tpl->InstanceTemplate()->SetInternalFieldCount(1);
+  tpl->InstanceTemplate()->SetInternalFieldCount(3);
 
   // Prototype
   NODE_SET_PROTOTYPE_METHOD(tpl, "setChild", SetChild);
+  NODE_SET_PROTOTYPE_METHOD(tpl, "openFile", OpenFile);
+  NODE_SET_PROTOTYPE_METHOD(tpl, "saveFile", SaveFile);
+  NODE_SET_PROTOTYPE_METHOD(tpl, "msgBox", MsgBox);
 
   constructor.Reset(isolate, tpl->GetFunction());
   exports->Set(String::NewFromUtf8(isolate, "Window"),
@@ -110,6 +114,40 @@ void Window::New(const FunctionCallbackInfo<Value>& args) {
         cons->NewInstance(context, argc, argv).ToLocalChecked();
     args.GetReturnValue().Set(result);
   }
+}
+
+void Window::OpenFile(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+  char *filename;
+  filename = uiOpenFile(mainwin);
+  args.GetReturnValue().Set(String::NewFromUtf8(isolate, filename));
+}
+
+void Window::SaveFile(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+  char *filename;
+  filename = uiSaveFile(mainwin);
+  args.GetReturnValue().Set(String::NewFromUtf8(isolate, filename));
+}
+
+void Window::MsgBox(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+
+  if (args.Length() < 2) {
+    isolate->ThrowException(Exception::TypeError(
+        String::NewFromUtf8(isolate, "Title and subtitle must be provided")));
+    return;
+  }
+
+  if (!args[0]->IsString() || !args[1]->IsString()) {
+    isolate->ThrowException(Exception::TypeError(
+        String::NewFromUtf8(isolate, "Title and subtitle must be String")));
+    return;
+  }
+
+  char* title = ToCString(args[0]);
+  char* subtitle = ToCString(args[1]);
+  uiMsgBox(mainwin, title, subtitle);
 }
 
 void Window::SetChild(const FunctionCallbackInfo<Value>& args) {

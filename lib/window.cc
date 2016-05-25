@@ -1,5 +1,4 @@
-#include <iostream>
-#include "window.h"
+#include "libui_js.h"
 
 namespace libui {
 

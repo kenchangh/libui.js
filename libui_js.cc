@@ -1,7 +1,4 @@
-#include <node.h>
-#include "lib/libui_methods.h"
-#include "lib/window.h"
-#include "lib/menu.h"
+#include "lib/libui_js.h"
 
 namespace libui {
 

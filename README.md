@@ -34,7 +34,26 @@ const menu = new libui.Menu('File', [
         return;
       }
       window.msgBox('File selected', filepath);
-    }
+    },
+  },
+  {
+    type: 'about',
+    onClick: () => {
+      console.log('about');
+    },
+  },
+  {
+    type: 'check',
+    label: 'Check this',
+    onClick: () => {
+      console.log('check');
+    },
+  },
+  {
+    type: 'preferences',
+    onClick: () => {
+      console.log('preferences');
+    },
   },
 ]); // has to come before window
 

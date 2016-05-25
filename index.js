@@ -7,20 +7,24 @@ const menu = new libui.Menu('File', [
     label: 'Open',
     type: 'item',
     onClick: () => {
-      console.log('haha')
-      /*const filepath = window.openFile();
+      const filepath = window.openFile();
       if (!filepath) {
         window.msgBox('No file selected', "Don't be alarmed");
         return;
       }
-      window.msgBox('File selected', filepath);*/
+      window.msgBox('File selected', filepath);
     }
   },
   {
     label: 'Save',
     type: 'item',
     onClick: () => {
-      console.log('open sesame!');
+      const filepath = window.saveFile();
+      if (!filepath) {
+        window.msgBox('No file selected', "Don't be alarmed");
+        return;
+      }
+      window.msgBox('File selected', filepath);
     }
   },
 ]); // has to come before window

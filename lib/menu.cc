@@ -1,9 +1,13 @@
+#include <vector>
 #include <iostream>
+#include <unordered_map>
 #include <string>
 #include "menu.h"
 
 namespace libui {
 
+using std::cout;
+using std::vector;
 using std::string;
 using v8::Array;
 using v8::Context;
@@ -18,30 +22,34 @@ using v8::Object;
 using v8::Persistent;
 using v8::String;
 using v8::Value;
+using v8::CopyablePersistentTraits;
 
 Persistent<Function> Menu::constructor;
 
+static vector<Persistent<Function, CopyablePersistentTraits<Function>>> onClickCallbacks;
 static Isolate* isolate;
-static Local<Function> onClickCb;
 
-void Menu::ItemClicked(uiMenuItem *item, uiWindow *w, void *data) {
+void itemClicked(uiMenuItem* item, uiWindow* w, void* data) {
+  int* index = (int*)data; // just casting void* to int*
+  Persistent<Function> onClickCb(isolate, onClickCallbacks[*index]);
   const unsigned argc = 0;
   Local<Value> argv[argc] = {};
-  onClickCb->Call(Null(isolate), argc, argv);
+  Local<Function>::New(isolate, onClickCb)->Call(Null(isolate), argc, argv);
 }
 
 Menu::Menu(char* name, Local<Value> items_) {
-  uiMenu* menu;
-  static uiMenuItem *item;
+  static uiMenu* menu;
   char* label;
   char* type;
-  Local<Function> onClick;
   menu = uiNewMenu(name);
 
   Local<Array> items;
   if (items_->IsArray()) {
     items = Local<Array>::Cast(items_);
-    for (unsigned int i = 0; i < items->Length(); i++) {
+    int len = items->Length();
+    onClickCallbacks.resize(len);
+
+    for (int i = 0; i < len; i++) {
       Local<Value> itemValue = items->Get(i);
       if (!itemValue->IsObject()) {
         isolate->ThrowException(Exception::TypeError(
@@ -72,13 +80,19 @@ Menu::Menu(char* name, Local<Value> items_) {
           String::NewFromUtf8(isolate, "Menu item's onClick must be a function")));
         return;
       }
-      onClickCb = Local<Function>::Cast(_onClickCb);
+      Local<Function> loc = Local<Function>::Cast(_onClickCb);
+      Persistent<Function, CopyablePersistentTraits<Function>> onClickCb(isolate, loc);
+      onClickCallbacks[i] = onClickCb;
 
+      uiMenuItem *item;
+      int* ptr = (int*)malloc(sizeof(int));
+      *ptr = i;
       item = uiMenuAppendItem(menu, label);
-      uiMenuItemOnClicked(item, Menu::ItemClicked, NULL);
+      uiMenuItemOnClicked(item, itemClicked, ptr);
     }
   }
 }
+
 Menu::~Menu() {
 }
 
@@ -127,10 +141,6 @@ void Menu::New(const FunctionCallbackInfo<Value>& args) {
 }
 
 void Menu::AppendItem(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  Menu* obj = ObjectWrap::Unwrap<Menu>(args.Holder());
-  args.GetReturnValue().Set(Number::New(isolate, 1));
 }
 
 

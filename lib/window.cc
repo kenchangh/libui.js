@@ -158,10 +158,6 @@ void Window::MsgBox(const FunctionCallbackInfo<Value>& args) {
 }
 
 void Window::SetChild(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-
-  Window* obj = ObjectWrap::Unwrap<Window>(args.Holder());
-  args.GetReturnValue().Set(Number::New(isolate, 1));
 }
 
 

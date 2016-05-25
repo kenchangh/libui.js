@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <sstream>
 
 #include <node.h>
 #include <node_object_wrap.h>

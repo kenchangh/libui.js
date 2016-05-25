@@ -2,6 +2,9 @@ libui.js
 ========
 Create desktop interfaces in JavaScript, backed by libui
 
+[![NPM module](https://img.shields.io/npm/v/libui.svg)](https://npmjs.org/package/libui)
+[![NPM downloads](https://img.shields.io/npm/dt/libui.svg)](https://npmjs.org/package/libui)
+
 Installation
 ---
 ```

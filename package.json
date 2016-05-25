@@ -2,10 +2,28 @@
   "name": "libui",
   "version": "0.0.0",
   "description": "Node.js bindings for libui",
-  "main": "hello.js",
-  "private": true,
+  "main": "index.js",
+  "keywords": [
+    "libui",
+    "desktop",
+    "GUI",
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mavenave/libui.js.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Chan Guan Hao",
+    "email": "guanhao3797@gmail.com",
+    "url": "http://mavenave.me"
+  },
   "gypfile": true,
-  "dependencies": {
-    "nan": "*"
+  "engines": {
+    "node": ">=5"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "build": "cd libui; make; cd ..; node-gyp build"
   }
 }

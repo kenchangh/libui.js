@@ -2,6 +2,12 @@ libui.js
 ========
 Create desktop interfaces in JavaScript, backed by libui
 
+Installation
+---
+```
+npm install libui
+```
+
 
 Example
 ---

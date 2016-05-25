@@ -1,12 +1,12 @@
 {
   "name": "libui",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "Node.js bindings for libui",
   "main": "index.js",
   "keywords": [
     "libui",
     "desktop",
-    "GUI",
+    "GUI"
   ],
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "node": ">=5"
   },
   "scripts": {
-    "start": "node index.js",
-    "build": "cd libui; make; cd ..; node-gyp build"
+    "example": "node example.js",
+    "postinstall": "npm submodule libui; cd libui; make; cd ..; node-gyp build"
   }
 }
